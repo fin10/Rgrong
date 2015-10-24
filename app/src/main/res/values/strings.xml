@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Rgrong</string>
+    <string name="refresh">Refresh</string>
+    <string name="filter">Filter</string>
+    <string name="all">All</string>
+    <string name="include_image">Include image</string>
+    <string name="view_options">View optoins</string>
+</resources>
