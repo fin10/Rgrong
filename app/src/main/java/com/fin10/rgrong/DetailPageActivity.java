@@ -30,10 +30,11 @@ public class DetailPageActivity extends Activity implements DetailPageItem.Resul
             actionBar.setTitle(title);
         }
 
+        String boardId = intent.getStringExtra("board_id");
         String id = intent.getStringExtra("id");
-        Log.d(TAG, String.format("id:%s", id));
-        if (!TextUtils.isEmpty(id)) {
-            DetailPageItem.fetch(id, this);
+        Log.d(TAG, String.format("boardId:%s, id:%s", boardId, id));
+        if (!TextUtils.isEmpty(boardId) && !TextUtils.isEmpty(id)) {
+            DetailPageItem.fetch(boardId, id, this);
         }
 
         mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_layout);
@@ -78,9 +79,11 @@ public class DetailPageActivity extends Activity implements DetailPageItem.Resul
 
     @Override
     public void onRefresh() {
-        String id = getIntent().getStringExtra("id");
-        if (!TextUtils.isEmpty(id)) {
-            DetailPageItem.fetch(id, this);
+        Intent intent = getIntent();
+        String boardId = intent.getStringExtra("board_id");
+        String id = intent.getStringExtra("id");
+        if (!TextUtils.isEmpty(boardId) && !TextUtils.isEmpty(id)) {
+            DetailPageItem.fetch(boardId, id, this);
         }
     }
 }

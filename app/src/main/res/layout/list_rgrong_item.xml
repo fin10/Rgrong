@@ -9,12 +9,12 @@
 
     <LinearLayout
         android:id="@+id/extra_layout"
-        android:orientation="vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
         android:gravity="end"
+        android:orientation="vertical"
         >
 
         <TextView
@@ -22,31 +22,31 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@color/colorAccent"
-            android:padding="4dp"
-            android:textSize="12dp"
-            android:textColor="@android:color/white"
             android:fontFamily="sans-serif-light"
+            android:padding="4dp"
+            android:textColor="@android:color/white"
+            android:textSize="12dp"
             />
 
         <TextView
             android:id="@+id/date_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingTop="4dp"
-            android:textSize="10dp"
-            android:textColor="@android:color/black"
             android:fontFamily="sans-serif-light"
+            android:paddingTop="4dp"
+            android:textColor="@android:color/black"
+            android:textSize="10dp"
             />
 
     </LinearLayout>
 
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_toStartOf="@id/extra_layout"
+        android:orientation="vertical"
         >
 
         <TextView

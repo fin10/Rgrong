@@ -20,34 +20,52 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.fin10.rgrong.widget.EndlessScrollListener;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends Activity implements AdapterView.OnItemClickListener, SwipeRefreshLayout.OnRefreshListener, PageItem.ResultListener, AdapterView.OnItemLongClickListener {
+public class MainActivity extends Activity implements AdapterView.OnItemClickListener, SwipeRefreshLayout.OnRefreshListener, PageItem.ResultListener, AdapterView.OnItemLongClickListener, BoardListView.BoardItemClickListener {
 
     private static final String TAG = "MainActivity";
 
     private int mPageCount = 1;
+    private RgrongListAdapter mRgrongListAdapter;
+    private SwipeRefreshLayout mRefreshLayout;
+    private ImagePreviewPopupWindow mPopupWindow;
+    private Drawer mDrawer;
+    private BoardItem mBoardItem;
     private final EndlessScrollListener mEndlessScrollListener = new EndlessScrollListener() {
 
         @Override
         public boolean onLoadMore(int page, int totalItemsCount) {
             Log.d(TAG, String.format("page:%d, count:%d", page, totalItemsCount));
-            PageItem.fetch(mPageCount, MainActivity.this);
+            PageItem.fetch(mBoardItem.getId(), mPageCount, MainActivity.this);
             return true;
         }
     };
-
-    private RgrongListAdapter mRgrongListAdapter;
-    private SwipeRefreshLayout mRefreshLayout;
-
-    private ImagePreviewPopupWindow mPopupWindow;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mBoardItem = BoardItem.getLastItem(this);
+        if (mBoardItem != null) {
+            setTitle(mBoardItem.getName());
+        }
+
+        BoardListView boardListView = new BoardListView(this);
+        boardListView.setOnItemClickListener(this);
+
+        mDrawer = new DrawerBuilder()
+                .withActivity(this)
+                .withTranslucentStatusBar(false)
+                .withActionBarDrawerToggle(false)
+                .withStatusBarColorRes(android.R.color.transparent)
+                .withCustomView(boardListView)
+                .build();
 
         mPopupWindow = new ImagePreviewPopupWindow(this);
 
@@ -66,6 +84,12 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mBoardItem.save(this);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main_activity, menu);
         return super.onCreateOptionsMenu(menu);
@@ -81,9 +105,25 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
             case R.id.menu_filter:
                 Toast.makeText(this, "not ready yet.", Toast.LENGTH_LONG).show();
                 return true;
+            case android.R.id.home:
+                if (mDrawer.isDrawerOpen()) {
+                    mDrawer.closeDrawer();
+                } else {
+                    mDrawer.openDrawer();
+                }
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mDrawer.isDrawerOpen()) {
+            mDrawer.closeDrawer();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override
@@ -91,6 +131,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         PageItem pageItem = (PageItem) mRgrongListAdapter.getItem(position);
         Intent intent = new Intent(this, DetailPageActivity.class);
         intent.putExtra("title", pageItem.getAuthor());
+        intent.putExtra("board_id", pageItem.getBoardId());
         intent.putExtra("id", pageItem.getId());
         startActivity(intent);
     }
@@ -139,7 +180,9 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     public void onRefresh() {
         mPageCount = 1;
         mRgrongListAdapter.clear();
-        PageItem.fetch(mPageCount, this);
+        if (mBoardItem != null) {
+            PageItem.fetch(mBoardItem.getId(), mPageCount, this);
+        }
     }
 
     @Override
@@ -147,6 +190,14 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         mRefreshLayout.setRefreshing(false);
         mRgrongListAdapter.addItems(pageItems);
         mPageCount = page + 1;
+    }
+
+    @Override
+    public void onBoardItemClicked(@NonNull BoardItem item) {
+        mDrawer.closeDrawer();
+        mBoardItem = item;
+        setTitle(mBoardItem.getName());
+        onRefresh();
     }
 
     private static class RgrongListAdapter extends BaseAdapter {

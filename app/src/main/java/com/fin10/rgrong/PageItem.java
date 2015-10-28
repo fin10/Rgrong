@@ -19,15 +19,17 @@ import java.util.List;
 public final class PageItem {
 
     private static final String TAG = "PageItem";
-    private static final String URL = "http://te31.com/m/mlist.php?id=rgrong";
+    private static final String URL = "http://te31.com/m/mlist.php?id=";
 
+    private final String mBoardId;
     private final String mText;
     private final String mId;
     private final String mComments;
     private final String mAuthor;
     private final String mDate;
 
-    PageItem(@NonNull Element page) throws NullPointerException {
+    private PageItem(@NonNull String boardId, @NonNull Element page) throws NullPointerException {
+        mBoardId = boardId;
         Elements tds = page.getElementsByTag("td");
         mComments = !TextUtils.isEmpty(tds.get(0).text()) ? tds.get(0).text() : "0";
         mText = tds.get(1).text();
@@ -41,7 +43,7 @@ public final class PageItem {
         mId = href.substring(href.lastIndexOf("no=") + "no=".length());
     }
 
-    public static void fetch(final int page, @NonNull final ResultListener listener) {
+    public static void fetch(@NonNull final String id, final int page, @NonNull final ResultListener listener) {
         new AsyncTask<Void, Void, List<PageItem>>() {
 
             @Override
@@ -49,6 +51,7 @@ public final class PageItem {
 
                 try {
                     String url = URL
+                            + id
                             + "&page="
                             + page;
 
@@ -84,8 +87,9 @@ public final class PageItem {
                         Log.d(TAG, String.format("src:%s", src));
                         if ("image_up.gif".equalsIgnoreCase(src)) {
                             try {
-                                pageItems.add(new PageItem(table));
+                                pageItems.add(new PageItem(id, table));
                             } catch (NullPointerException e) {
+                                e.printStackTrace();
                             }
                         }
                     }
@@ -125,12 +129,14 @@ public final class PageItem {
 
         PageItem pageItem = (PageItem) o;
 
-        return mId.equals(pageItem.mId);
+        return mBoardId.equals(pageItem.mBoardId) && mId.equals(pageItem.mId);
     }
 
     @Override
     public int hashCode() {
-        return mId.hashCode();
+        int result = mBoardId.hashCode();
+        result = 31 * result + mId.hashCode();
+        return result;
     }
 
     @NonNull
@@ -146,6 +152,11 @@ public final class PageItem {
     @NonNull
     public String getAuthor() {
         return mAuthor;
+    }
+
+    @NonNull
+    public String getBoardId() {
+        return mBoardId;
     }
 
     public interface ResultListener {

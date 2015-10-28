@@ -2,7 +2,6 @@ package com.fin10.rgrong;
 
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -20,23 +19,24 @@ import java.util.List;
 public final class DetailPageItem {
 
     private static final String TAG = "DetailPageItem";
-    private static final String DETAIL_URL = "http://te31.com/m/view.php?id=rgrong";
+    private static final String URL = "http://te31.com/m/view.php?id=";
 
     private final String mLink;
 
-    DetailPageItem(@NonNull String src) {
+    private DetailPageItem(@NonNull String src) {
         mLink = src;
     }
 
-    public static void fetch(@NonNull final String id, @NonNull final ResultListener listener) {
+    public static void fetch(@NonNull final String id, @NonNull final String number, @NonNull final ResultListener listener) {
         new AsyncTask<Void, Void, DetailPageItem>() {
 
             @Override
             protected DetailPageItem doInBackground(Void... params) {
 
-                String url = DETAIL_URL
+                String url = URL
+                        + id
                         + "&no="
-                        + id;
+                        + number;
 
                 return new DetailPageItem(url);
             }
@@ -55,7 +55,8 @@ public final class DetailPageItem {
             @Override
             protected List<String> doInBackground(Void... params) {
                 try {
-                    String url = DETAIL_URL
+                    String url = URL
+                            + item.getBoardId()
                             + "&no="
                             + item.getId();
 
