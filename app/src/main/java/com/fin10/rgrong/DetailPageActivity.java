@@ -1,18 +1,19 @@
 package com.fin10.rgrong;
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
 
-public class DetailPageActivity extends Activity implements DetailPageItem.ResultListener, SwipeRefreshLayout.OnRefreshListener {
+public class DetailPageActivity extends AppCompatActivity implements DetailPageItem.ResultListener, SwipeRefreshLayout.OnRefreshListener {
 
     private static final String TAG = "DetailPageActivity";
     private WebView mWebView;
@@ -23,11 +24,14 @@ public class DetailPageActivity extends Activity implements DetailPageItem.Resul
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
         Intent intent = getIntent();
-        ActionBar actionBar = getActionBar();
         if (actionBar != null) {
             String title = intent.getStringExtra("title");
             actionBar.setTitle(title);
+            actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
         String boardId = intent.getStringExtra("board_id");

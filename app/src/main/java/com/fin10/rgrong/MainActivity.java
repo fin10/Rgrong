@@ -1,11 +1,16 @@
 package com.fin10.rgrong;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,13 +25,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.fin10.rgrong.widget.EndlessScrollListener;
-import com.mikepenz.materialdrawer.Drawer;
-import com.mikepenz.materialdrawer.DrawerBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends Activity implements AdapterView.OnItemClickListener, SwipeRefreshLayout.OnRefreshListener, PageItem.ResultListener, AdapterView.OnItemLongClickListener, BoardListView.BoardItemClickListener {
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, SwipeRefreshLayout.OnRefreshListener, PageItem.ResultListener, AdapterView.OnItemLongClickListener, BoardListView.BoardItemClickListener, View.OnClickListener {
 
     private static final String TAG = "MainActivity";
 
@@ -34,7 +37,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     private RgrongListAdapter mRgrongListAdapter;
     private SwipeRefreshLayout mRefreshLayout;
     private ImagePreviewPopupWindow mPopupWindow;
-    private Drawer mDrawer;
     private BoardItem mBoardItem;
     private final EndlessScrollListener mEndlessScrollListener = new EndlessScrollListener() {
 
@@ -46,26 +48,36 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         }
     };
 
+    private View mLoginButton;
+    private View mLogoutButton;
+    private DrawerLayout mDrawer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+
         mBoardItem = BoardItem.getLastItem(this);
-        if (mBoardItem != null) {
-            setTitle(mBoardItem.getName());
+        if (mBoardItem != null && actionBar != null) {
+            actionBar.setTitle(mBoardItem.getName());
         }
 
-        BoardListView boardListView = new BoardListView(this);
-        boardListView.setOnItemClickListener(this);
+        mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawer, toolbar, R.string.open, R.string.close);
+        mDrawer.setDrawerListener(toggle);
+        toggle.syncState();
 
-        mDrawer = new DrawerBuilder()
-                .withActivity(this)
-                .withTranslucentStatusBar(false)
-                .withActionBarDrawerToggle(false)
-                .withStatusBarColorRes(android.R.color.transparent)
-                .withCustomView(boardListView)
-                .build();
+        mLoginButton = findViewById(R.id.login_button);
+        mLoginButton.setOnClickListener(this);
+        mLogoutButton = findViewById(R.id.logout_button);
+        mLogoutButton.setOnClickListener(this);
+
+        BoardListView boardListView = (BoardListView) findViewById(R.id.board_list_view);
+        boardListView.setOnItemClickListener(this);
 
         mPopupWindow = new ImagePreviewPopupWindow(this);
 
@@ -80,13 +92,18 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         listView.setOnItemLongClickListener(this);
         listView.setOnScrollListener(mEndlessScrollListener);
 
+        View fab = findViewById(R.id.fab);
+        fab.setOnClickListener(this);
+
         onRefresh();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mBoardItem.save(this);
+        if (mBoardItem != null) {
+            mBoardItem.save(this);
+        }
     }
 
     @Override
@@ -105,13 +122,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
             case R.id.menu_filter:
                 Toast.makeText(this, "not ready yet.", Toast.LENGTH_LONG).show();
                 return true;
-            case android.R.id.home:
-                if (mDrawer.isDrawerOpen()) {
-                    mDrawer.closeDrawer();
-                } else {
-                    mDrawer.openDrawer();
-                }
-                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -119,8 +129,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
     @Override
     public void onBackPressed() {
-        if (mDrawer.isDrawerOpen()) {
-            mDrawer.closeDrawer();
+        if (mDrawer.isDrawerOpen(GravityCompat.START)) {
+            mDrawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
         }
@@ -194,10 +204,40 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
     @Override
     public void onBoardItemClicked(@NonNull BoardItem item) {
-        mDrawer.closeDrawer();
         mBoardItem = item;
-        setTitle(mBoardItem.getName());
+        mDrawer.closeDrawer(GravityCompat.START);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(mBoardItem.getName());
+        }
         onRefresh();
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.fab: {
+                Intent intent = new Intent(this, WebViewActivity.class);
+                intent.putExtra("title", mBoardItem.getName());
+                intent.putExtra("url", WebViewActivity.WRITE_URL + mBoardItem.getId());
+                startActivity(intent);
+                break;
+            }
+            case R.id.login_button: {
+                Intent intent = new Intent(this, WebViewActivity.class);
+                intent.putExtra("title", getResources().getString(R.string.login));
+                intent.putExtra("url", WebViewActivity.LOGIN_URL);
+                startActivity(intent);
+                break;
+            }
+            case R.id.logout_button: {
+                Intent intent = new Intent(this, WebViewActivity.class);
+                intent.putExtra("title", getResources().getString(R.string.logout));
+                intent.putExtra("url", WebViewActivity.LOGOUT_URL);
+                startActivity(intent);
+                break;
+            }
+        }
     }
 
     private static class RgrongListAdapter extends BaseAdapter {

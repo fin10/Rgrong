@@ -1,27 +1,13 @@
 <resources>
-
-    <style name="AppTheme" parent="android:Theme.DeviceDefault.Light">
-        <item name="android:actionBarStyle">@style/ActionBarStyle</item>
-        <item name="android:colorPrimary">@color/colorPrimary</item>
-        <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="android:colorAccent">@color/colorAccent</item>
-        <item name="android:statusBarColor">@color/colorPrimary</item>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
-    <style name="BackButtonAppTheme" parent="AppTheme">
-        <item name="android:actionBarStyle">@style/ActionBarStyleWithBackButton</item>
+    <style name="DetailActivity" parent="AppTheme">
+        <item name="android:statusBarColor">@color/colorPrimaryDark</item>
     </style>
-
-    <style name="MainActivityTheme" parent="BackButtonAppTheme">
-        <item name="android:homeAsUpIndicator">@mipmap/ic_menu_white_24dp</item>
-    </style>
-
-    <style name="ActionBarStyle" parent="android:Widget.DeviceDefault.Light.ActionBar">
-        <item name="android:elevation">1dp</item>
-    </style>
-
-    <style name="ActionBarStyleWithBackButton" parent="ActionBarStyle">
-        <item name="android:displayOptions">showTitle|homeAsUp</item>
-    </style>
-
 </resources>

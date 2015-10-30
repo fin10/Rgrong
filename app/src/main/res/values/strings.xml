@@ -6,4 +6,8 @@
     <string name="include_image">Include image</string>
     <string name="view_options">View optoins</string>
     <string name="no_items">No items</string>
+    <string name="open">open</string>
+    <string name="close">close</string>
+    <string name="login">Login</string>
+    <string name="logout">Logout</string>
 </resources>
