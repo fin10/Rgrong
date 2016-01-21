@@ -2,6 +2,7 @@ package com.fin10.rgrong;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,9 +13,9 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
-import java.util.List;
+import java.util.Collection;
 
-public final class ImagePreviewPopupWindow implements DetailPageItem.ImageLinkResultListener {
+public final class ImagePreviewPopupWindow {
 
     private final WebView mWebView;
     private final ImageView mImageView;
@@ -35,37 +36,44 @@ public final class ImagePreviewPopupWindow implements DetailPageItem.ImageLinkRe
         mPopupWindow = new PopupWindow(view, size, size);
     }
 
-    public void show(@NonNull View anchor, @NonNull PageItem item) {
+    public void show(@NonNull View anchor, @NonNull PostModel post) {
         mPopupWindow.showAsDropDown(anchor);
-        DetailPageItem.fetchImages(item, this);
         mWebView.setVisibility(View.GONE);
         mImageView.setVisibility(View.GONE);
+
+        new AsyncTask<PostModel, Void, Collection<String>>() {
+
+            @Override
+            protected Collection<String> doInBackground(PostModel... params) {
+                return params[0].getThumbnailLinks();
+            }
+
+            @Override
+            protected void onPostExecute(Collection<String> imageLinks) {
+                if (!imageLinks.isEmpty()) {
+                    String link = imageLinks.iterator().next();
+                    mTitleView.setText(link);
+
+                    if (link.endsWith(".gif") || link.endsWith(".GIF")) {
+                        mImageView.setVisibility(View.GONE);
+                        mWebView.setVisibility(View.VISIBLE);
+                        mWebView.loadUrl(link);
+                    } else {
+                        mImageView.setVisibility(View.VISIBLE);
+                        mWebView.setVisibility(View.GONE);
+                        Glide.with(mImageView.getContext())
+                                .load(link)
+                                .crossFade()
+                                .centerCrop()
+                                .into(mImageView);
+                    }
+                }
+            }
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, post);
     }
 
     public void dismiss() {
         mPopupWindow.dismiss();
         mTitleView.setText("");
-    }
-
-    @Override
-    public void onResult(@NonNull List<String> imageLinks) {
-        if (!imageLinks.isEmpty()) {
-            String link = imageLinks.get(0);
-            mTitleView.setText(link);
-
-            if (link.endsWith(".gif")) {
-                mImageView.setVisibility(View.GONE);
-                mWebView.setVisibility(View.VISIBLE);
-                mWebView.loadUrl(link);
-            } else {
-                mImageView.setVisibility(View.VISIBLE);
-                mWebView.setVisibility(View.GONE);
-                Glide.with(mImageView.getContext())
-                        .load(link)
-                        .crossFade()
-                        .centerCrop()
-                        .into(mImageView);
-            }
-        }
     }
 }

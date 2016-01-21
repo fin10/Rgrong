@@ -9,8 +9,6 @@ import android.webkit.WebView;
 
 public final class WebViewActivity extends AppCompatActivity {
 
-    private static final String TAG = "WebViewActivity";
-
     public static final String WRITE_URL = "http://te31.com/m/write.php?id=";
     public static final String LOGIN_URL = "http://te31.com/m/main_login.php";
     public static final String LOGOUT_URL = "http://te31.com/rgr/logout.php";
@@ -43,6 +41,6 @@ public final class WebViewActivity extends AppCompatActivity {
                 return true;
         }
 
-        return super.onOptionsItemSelected(item);
+        return false;
     }
 }

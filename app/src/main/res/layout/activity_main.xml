@@ -24,18 +24,13 @@
                 layout="@layout/toolbar_layout"
                 />
 
-            <android.support.v4.widget.SwipeRefreshLayout
-                android:id="@+id/swipe_layout"
+            <fragment
+                android:id="@+id/board_fragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                >
+                android:name="com.fin10.rgrong.BoardFragment"
+                />
 
-                <ListView
-                    android:id="@+id/list_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
-
-            </android.support.v4.widget.SwipeRefreshLayout>
         </LinearLayout>
 
         <android.support.design.widget.FloatingActionButton
@@ -64,10 +59,12 @@
 
             <include layout="@layout/drawer_header_layout" />
 
-            <com.fin10.rgrong.BoardListView
-                android:id="@+id/board_list_view"
+            <fragment
+                android:id="@+id/board_list_fragment"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="match_parent"
+                android:name="com.fin10.rgrong.BoardListFragment"
+                />
 
         </LinearLayout>
     </android.support.design.widget.NavigationView>
