@@ -13,19 +13,19 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-public final class MainActivity extends AppCompatActivity implements View.OnClickListener, BoardListFragment.OnItemClickListener {
+public final class MainActivity extends AppCompatActivity implements View.OnClickListener, BoardListFragment.OnItemClickListener, AccountController.LoginStateListener {
 
     private BoardFragment mBoardFragment;
     private BoardModel mBoard;
 
-    private View mLoginButton;
-    private View mLogoutButton;
     private DrawerLayout mDrawer;
+    private View mNewPostButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        AccountController.addListener(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -41,24 +41,21 @@ public final class MainActivity extends AppCompatActivity implements View.OnClic
         mDrawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        mLoginButton = findViewById(R.id.login_button);
-        mLoginButton.setOnClickListener(this);
-        mLogoutButton = findViewById(R.id.logout_button);
-        mLogoutButton.setOnClickListener(this);
-
         mBoardFragment = (BoardFragment) getFragmentManager().findFragmentById(R.id.board_fragment);
         mBoardFragment.setBoard(mBoard);
 
         BoardListFragment boardListFragment = (BoardListFragment) getFragmentManager().findFragmentById(R.id.board_list_fragment);
         boardListFragment.setOnItemClickListener(this);
 
-        View fab = findViewById(R.id.fab);
-        fab.setOnClickListener(this);
+        mNewPostButton = findViewById(R.id.fab);
+        mNewPostButton.setOnClickListener(this);
+        mNewPostButton.setVisibility(AccountController.isLogin() ? View.VISIBLE : View.GONE);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        AccountController.removeListener(this);
         if (mBoard != null) {
             mBoard.save(this);
         }
@@ -105,26 +102,16 @@ public final class MainActivity extends AppCompatActivity implements View.OnClic
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fab: {
-                Intent intent = new Intent(this, WebViewActivity.class);
-                intent.putExtra("title", mBoard.getName());
-                intent.putExtra("url", WebViewActivity.WRITE_URL + mBoard.getId());
-                startActivity(intent);
-                break;
-            }
-            case R.id.login_button: {
-                Intent intent = new Intent(this, WebViewActivity.class);
-                intent.putExtra("title", getResources().getString(R.string.login));
-                intent.putExtra("url", WebViewActivity.LOGIN_URL);
-                startActivity(intent);
-                break;
-            }
-            case R.id.logout_button: {
-                Intent intent = new Intent(this, WebViewActivity.class);
-                intent.putExtra("title", getResources().getString(R.string.logout));
-                intent.putExtra("url", WebViewActivity.LOGOUT_URL);
+                Intent intent = new Intent(this, NewPostActivity.class);
+                intent.putExtra("board", mBoard);
                 startActivity(intent);
                 break;
             }
         }
+    }
+
+    @Override
+    public void onLoginStateChanged(boolean login) {
+        mNewPostButton.setVisibility(AccountController.isLogin() ? View.VISIBLE : View.GONE);
     }
 }

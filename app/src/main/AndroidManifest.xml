@@ -19,14 +19,20 @@
 
         <activity
             android:name=".PostViewActivity"
-            android:theme="@style/DetailActivity"
             android:exported="false"
+            android:theme="@style/DetailActivity"
             />
 
         <activity
-            android:name=".WebViewActivity"
-            android:theme="@style/DetailActivity"
+            android:name=".NewPostActivity"
             android:exported="false"
+            android:theme="@style/DetailActivity"
+            />
+
+        <activity
+            android:name=".AccountController$LoginActivity"
+            android:exported="false"
+            android:theme="@style/DetailActivity"
             />
 
     </application>

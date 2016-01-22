@@ -98,12 +98,17 @@ public final class BoardListFragment extends Fragment implements SwipeRefreshLay
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
-                convertView = mLayoutInflater.inflate(android.R.layout.simple_list_item_1, parent, false);
+                convertView = mLayoutInflater.inflate(R.layout.list_board_item, parent, false);
+                convertView.setTag(R.id.name_view, convertView.findViewById(R.id.name_view));
+                convertView.setTag(R.id.count_view, convertView.findViewById(R.id.count_view));
             }
 
             BoardModel board = (BoardModel) getItem(position);
-            TextView nameView = (TextView) convertView.findViewById(android.R.id.text1);
+            TextView nameView = (TextView) convertView.getTag(R.id.name_view);
             nameView.setText(board.getName());
+
+            TextView countView = (TextView) convertView.getTag(R.id.count_view);
+            countView.setText(board.getNewPostCount() > 0 ? String.valueOf(board.getNewPostCount()) : "");
 
             return convertView;
         }

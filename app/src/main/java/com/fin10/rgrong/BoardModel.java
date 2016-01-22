@@ -2,6 +2,8 @@ package com.fin10.rgrong;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -20,17 +22,38 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class BoardModel {
+public final class BoardModel implements Parcelable {
+
+    public static final Creator<BoardModel> CREATOR = new Creator<BoardModel>() {
+        @Override
+        public BoardModel createFromParcel(Parcel in) {
+            return new BoardModel(in);
+        }
+
+        @Override
+        public BoardModel[] newArray(int size) {
+            return new BoardModel[size];
+        }
+    };
 
     private static final String PREF_KEY_LAST_BOARD_ITEM = "pref_key_last_board_item";
-
     private static final String URL = "http://te31.com/m/main.php";
-
     private final String mName;
     private final String mId;
+    private final int mNewPostCount;
 
     private BoardModel(@NonNull Element td) {
-        mName = td.text();
+        String name = td.text().replace(" -", "");
+        String[] results = name.split("[^0-9]+");
+        mName = results.length == 2 ? name.replace(results[1], "").trim() : name;
+
+        int count = 0;
+        try {
+            count = results.length == 2 ? Integer.parseInt(results[1]) : 0;
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
+        mNewPostCount = count;
 
         Elements links = td.getElementsByTag("a");
         Element link = links.get(0);
@@ -41,12 +64,20 @@ public final class BoardModel {
     private BoardModel(@NonNull String name, @NonNull String id) {
         mName = name;
         mId = id;
+        mNewPostCount = 0;
     }
 
     private BoardModel(@NonNull String jsonString) throws JSONException {
         JSONObject jsonObject = new JSONObject(jsonString);
         mName = jsonObject.getString("name");
         mId = jsonObject.getString("id");
+        mNewPostCount = 0;
+    }
+
+    private BoardModel(@NonNull Parcel in) {
+        mName = in.readString();
+        mId = in.readString();
+        mNewPostCount = in.readInt();
     }
 
     @NonNull
@@ -117,6 +148,10 @@ public final class BoardModel {
         return mName;
     }
 
+    public int getNewPostCount() {
+        return mNewPostCount;
+    }
+
     @NonNull
     private String toJsonString() throws JSONException {
         JSONObject jsonObject = new JSONObject();
@@ -124,5 +159,17 @@ public final class BoardModel {
         jsonObject.put("id", mId);
 
         return jsonObject.toString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(mName);
+        dest.writeString(mId);
+        dest.writeInt(mNewPostCount);
     }
 }

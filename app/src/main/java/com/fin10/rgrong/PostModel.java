@@ -30,8 +30,9 @@ public final class PostModel implements Parcelable {
             return new PostModel[size];
         }
     };
+
     private static final String URL = "http://te31.com/m/mlist.php?id=";
-    private static final String URL_DETAIL = "http://te31.com/m/view.php?id=";
+    private static final String DETAIL_URL = "http://te31.com/m/view.php?id=";
     private final String mBoardId;
     private final String mId;
     private final String mTitle;
@@ -182,12 +183,7 @@ public final class PostModel implements Parcelable {
         }
 
         try {
-            String url = URL_DETAIL
-                    + mBoardId
-                    + "&no="
-                    + mId;
-
-            Connection connection = Jsoup.connect(url);
+            Connection connection = Jsoup.connect(getUrl());
             Document doc = connection.get();
 
             mThumbnailLinks = new ArrayList<>();
@@ -237,6 +233,6 @@ public final class PostModel implements Parcelable {
 
     @NonNull
     public String getUrl() {
-        return URL_DETAIL + mBoardId + "&no=" + mId;
+        return DETAIL_URL + mBoardId + "&no=" + mId;
     }
 }

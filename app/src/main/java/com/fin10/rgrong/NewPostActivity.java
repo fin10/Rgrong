@@ -6,12 +6,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
-public final class WebViewActivity extends AppCompatActivity {
+public final class NewPostActivity extends AppCompatActivity {
 
-    public static final String WRITE_URL = "http://te31.com/m/write.php?id=";
-    public static final String LOGIN_URL = "http://te31.com/m/main_login.php";
-    public static final String LOGOUT_URL = "http://te31.com/rgr/logout.php";
+    private static final String WRITE_URL = "http://te31.com/m/write.php?id=";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,16 +20,30 @@ public final class WebViewActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        String title = getIntent().getStringExtra("title");
-        String url = getIntent().getStringExtra("url");
+        BoardModel board = getIntent().getParcelableExtra("board");
+        if (board == null) {
+            finish();
+            return;
+        }
+
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
-            actionBar.setTitle(title);
+            actionBar.setTitle(board.getName());
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
         WebView webView = (WebView) findViewById(R.id.web_view);
-        webView.loadUrl(url);
+        webView.loadUrl(WRITE_URL + board.getId());
+        webView.setWebViewClient(new WebViewClient() {
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                Log.d(String.valueOf(url));
+                if (url != null && !url.startsWith(WRITE_URL)) {
+                    finish();
+                }
+            }
+        });
     }
 
     @Override
