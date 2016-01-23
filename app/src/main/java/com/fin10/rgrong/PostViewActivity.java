@@ -41,7 +41,7 @@ public final class PostViewActivity extends AppCompatActivity implements SwipeRe
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_detail_activity, menu);
+        getMenuInflater().inflate(R.menu.menu_post_view_activity, menu);
         return super.onCreateOptionsMenu(menu);
     }
 

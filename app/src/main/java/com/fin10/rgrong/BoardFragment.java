@@ -27,6 +27,7 @@ public final class BoardFragment extends Fragment implements SwipeRefreshLayout.
 
     private int mPageCount = 1;
     private BoardModel mBoard;
+    private PostModel.Filter mFilter = PostModel.Filter.NONE;
     private ImagePreviewPopupWindow mPopupWindow;
     private SwipeRefreshLayout mRefreshLayout;
     private PostAdapter mPostAdapter;
@@ -43,7 +44,7 @@ public final class BoardFragment extends Fragment implements SwipeRefreshLayout.
 
                 @Override
                 protected List<PostModel> doInBackground(Void... params) {
-                    return PostModel.getPosts(mBoard.getId(), mPageCount);
+                    return PostModel.getPosts(mBoard.getId(), mPageCount, mFilter);
                 }
 
                 @Override
@@ -58,7 +59,8 @@ public final class BoardFragment extends Fragment implements SwipeRefreshLayout.
         }
     };
 
-    public void setBoard(@NonNull BoardModel board) {
+    public void setBoard(@NonNull BoardModel board, PostModel.Filter filter) {
+        mFilter = filter;
         mBoard = board;
         onRefresh();
     }
@@ -105,6 +107,8 @@ public final class BoardFragment extends Fragment implements SwipeRefreshLayout.
     @Override
     public boolean onItemLongClick(final AdapterView<?> parent, View view, int position, long id) {
         PostModel post = (PostModel) parent.getItemAtPosition(position);
+        if (!post.hasImages()) return false;
+
         mPopupWindow.show(view, post);
 
         parent.setOnTouchListener(new View.OnTouchListener() {
@@ -174,6 +178,7 @@ public final class BoardFragment extends Fragment implements SwipeRefreshLayout.
                 convertView.setTag(R.id.sub_title_text_view, convertView.findViewById(R.id.sub_title_text_view));
                 convertView.setTag(R.id.comments_text_view, convertView.findViewById(R.id.comments_text_view));
                 convertView.setTag(R.id.date_text_view, convertView.findViewById(R.id.date_text_view));
+                convertView.setTag(R.id.image_icon_view, convertView.findViewById(R.id.image_icon_view));
             }
 
             PostModel post = (PostModel) getItem(position);
@@ -188,6 +193,9 @@ public final class BoardFragment extends Fragment implements SwipeRefreshLayout.
 
             TextView dateView = (TextView) convertView.getTag(R.id.date_text_view);
             dateView.setText(post.getDate());
+
+            View imageIconView = (View) convertView.getTag(R.id.image_icon_view);
+            imageIconView.setVisibility(post.hasImages() ? View.VISIBLE : View.GONE);
 
             return convertView;
         }

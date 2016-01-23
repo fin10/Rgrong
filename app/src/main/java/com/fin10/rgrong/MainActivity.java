@@ -2,6 +2,7 @@ package com.fin10.rgrong;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -14,6 +15,8 @@ import android.view.MenuItem;
 import android.view.View;
 
 public final class MainActivity extends AppCompatActivity implements View.OnClickListener, BoardListFragment.OnItemClickListener, AccountController.LoginStateListener {
+
+    private static final String PREF_FILTER = "pref_filter";
 
     private BoardFragment mBoardFragment;
     private BoardModel mBoard;
@@ -41,8 +44,11 @@ public final class MainActivity extends AppCompatActivity implements View.OnClic
         mDrawer.setDrawerListener(toggle);
         toggle.syncState();
 
+        String value = PreferenceManager.getDefaultSharedPreferences(this).getString(PREF_FILTER, String.valueOf(PostModel.Filter.NONE));
+        PostModel.Filter filter = PostModel.Filter.valueOf(value);
+
         mBoardFragment = (BoardFragment) getFragmentManager().findFragmentById(R.id.board_fragment);
-        mBoardFragment.setBoard(mBoard);
+        mBoardFragment.setBoard(mBoard, filter);
 
         BoardListFragment boardListFragment = (BoardListFragment) getFragmentManager().findFragmentById(R.id.board_list_fragment);
         boardListFragment.setOnItemClickListener(this);
@@ -64,6 +70,20 @@ public final class MainActivity extends AppCompatActivity implements View.OnClic
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main_activity, menu);
+
+        String value = PreferenceManager.getDefaultSharedPreferences(this).getString(PREF_FILTER, String.valueOf(PostModel.Filter.NONE));
+        PostModel.Filter filter = PostModel.Filter.valueOf(value);
+
+        MenuItem item = menu.findItem(R.id.menu_filter_only_images);
+        switch (filter) {
+            case NONE:
+                item.setChecked(false);
+                break;
+            case ONLY_WITH_IMAGES:
+                item.setChecked(true);
+                break;
+        }
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -75,9 +95,26 @@ public final class MainActivity extends AppCompatActivity implements View.OnClic
                 return true;
             case R.id.menu_filter:
                 return true;
+            case R.id.menu_filter_only_images:
+                if (item.isChecked()) {
+                    item.setChecked(false);
+                    mBoardFragment.setBoard(mBoard, PostModel.Filter.NONE);
+                    PreferenceManager.getDefaultSharedPreferences(this)
+                            .edit()
+                            .putString(PREF_FILTER, String.valueOf(PostModel.Filter.NONE))
+                            .apply();
+                } else {
+                    item.setChecked(true);
+                    mBoardFragment.setBoard(mBoard, PostModel.Filter.ONLY_WITH_IMAGES);
+                    PreferenceManager.getDefaultSharedPreferences(this)
+                            .edit()
+                            .putString(PREF_FILTER, String.valueOf(PostModel.Filter.ONLY_WITH_IMAGES))
+                            .apply();
+                }
+                return true;
         }
 
-        return super.onOptionsItemSelected(item);
+        return false;
     }
 
     @Override
@@ -98,7 +135,7 @@ public final class MainActivity extends AppCompatActivity implements View.OnClic
             actionBar.setTitle(mBoard.getName());
         }
 
-        mBoardFragment.setBoard(mBoard);
+        mBoardFragment.setBoard(mBoard, PostModel.Filter.NONE);
     }
 
     @Override

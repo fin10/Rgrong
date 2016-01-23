@@ -36,12 +36,14 @@ public final class PostModel implements Parcelable {
     private final String mId;
     private final String mTitle;
     private final int mCommentCount;
+    private final boolean mHasImages;
     private final String mAuthor;
     private final String mDate;
     private List<String> mThumbnailLinks;
 
-    private PostModel(@NonNull String boardId, @NonNull Element page) throws NullPointerException {
+    private PostModel(@NonNull String boardId, @NonNull Element page, boolean hasImages) throws NullPointerException, IndexOutOfBoundsException {
         mBoardId = boardId;
+        mHasImages = hasImages;
         Elements tds = page.getElementsByTag("td");
         mTitle = tds.get(1).text();
         mAuthor = tds.get(2).text();
@@ -68,13 +70,14 @@ public final class PostModel implements Parcelable {
         mId = in.readString();
         mTitle = in.readString();
         mCommentCount = in.readInt();
+        mHasImages = in.readByte() != 0;
         mAuthor = in.readString();
         mDate = in.readString();
         mThumbnailLinks = in.createStringArrayList();
     }
 
     @NonNull
-    public static List<PostModel> getPosts(@NonNull final String id, final int page) {
+    public static List<PostModel> getPosts(@NonNull final String id, final int page, Filter filter) {
         try {
             String url = URL
                     + id
@@ -107,14 +110,27 @@ public final class PostModel implements Parcelable {
                     continue;
                 }
 
-                Element img = imgs.get(0);
-                String src = img.attr("src");
-                if ("image_up.gif".equalsIgnoreCase(src)) {
-                    try {
-                        posts.add(new PostModel(id, table));
-                    } catch (NullPointerException e) {
-                        e.printStackTrace();
+                try {
+                    boolean hasImages = false;
+                    int c = imgs.size();
+                    for (int j = 0; j < c; ++j) {
+                        Element img = imgs.get(j);
+                        if ("image_up.gif".equalsIgnoreCase(img.attr("src"))) {
+                            hasImages = true;
+                            break;
+                        }
                     }
+
+                    switch (filter) {
+                        case NONE:
+                            posts.add(new PostModel(id, table, hasImages));
+                            break;
+                        case ONLY_WITH_IMAGES:
+                            if (hasImages) posts.add(new PostModel(id, table, true));
+                            break;
+                    }
+                } catch (NullPointerException | IndexOutOfBoundsException e) {
+                    e.printStackTrace();
                 }
             }
 
@@ -170,9 +186,8 @@ public final class PostModel implements Parcelable {
         return mAuthor;
     }
 
-    @NonNull
-    public String getBoardId() {
-        return mBoardId;
+    public boolean hasImages() {
+        return mHasImages;
     }
 
     @NonNull
@@ -214,6 +229,11 @@ public final class PostModel implements Parcelable {
         return Collections.emptyList();
     }
 
+    @NonNull
+    public String getUrl() {
+        return Constants.Url.VIEW + "?id=" + mBoardId + "&no=" + mId;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -225,13 +245,13 @@ public final class PostModel implements Parcelable {
         dest.writeString(mId);
         dest.writeString(mTitle);
         dest.writeInt(mCommentCount);
+        dest.writeByte((byte) (mHasImages ? 1 : 0));
         dest.writeString(mAuthor);
         dest.writeString(mDate);
         dest.writeStringList(mThumbnailLinks);
     }
 
-    @NonNull
-    public String getUrl() {
-        return Constants.Url.VIEW + "?id=" + mBoardId + "&no=" + mId;
+    public enum Filter {
+        NONE, ONLY_WITH_IMAGES,
     }
 }

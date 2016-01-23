@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="filter">필터</string>
+    <string name="login">로그인</string>
+    <string name="logout">로그아웃</string>
+    <string name="only_post_with_images">이미지가 포함된 글만 보기</string>
+    <string name="close">닫기</string>
+    <string name="open">열기</string>
+    <string name="refresh">새로고침</string>
+</resources>
