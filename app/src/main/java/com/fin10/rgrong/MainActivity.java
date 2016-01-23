@@ -91,11 +91,14 @@ public final class MainActivity extends AppCompatActivity implements View.OnClic
 
     @Override
     public void onItemClicked(@NonNull BoardModel board) {
+        mBoard = board;
         mDrawer.closeDrawer(GravityCompat.START);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setTitle(mBoard.getName());
         }
+
+        mBoardFragment.setBoard(mBoard);
     }
 
     @Override

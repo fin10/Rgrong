@@ -51,7 +51,9 @@ public final class BoardListFragment extends Fragment implements SwipeRefreshLay
 
     @Override
     public void onRefresh() {
-        mBoardAdapter.refresh();
+        if (!mRefreshLayout.isRefreshing()) {
+            mBoardAdapter.refresh();
+        }
     }
 
     @Override
