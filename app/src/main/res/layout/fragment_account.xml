@@ -6,12 +6,13 @@
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
     android:elevation="4dp"
-    android:padding="16dp"
+    android:padding="8dp"
     tools:context=".MainActivity">
 
     <ImageView
         android:layout_width="48dp"
         android:layout_height="48dp"
+        android:layout_alignParentBottom="true"
         android:src="@mipmap/ic_rgrong"
         />
 
