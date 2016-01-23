@@ -19,8 +19,6 @@ import java.util.List;
 
 public final class AccountController {
 
-    private static final String URL = "http://te31.com/m/main.php";
-
     private static final List<LoginStateListener> sListeners = new LinkedList<>();
 
     public static void addListener(@NonNull LoginStateListener listener) {
@@ -34,7 +32,7 @@ public final class AccountController {
     }
 
     public static boolean isLogin() {
-        String cookie = CookieManager.getInstance().getCookie(URL);
+        String cookie = CookieManager.getInstance().getCookie(Constants.Url.MAIN);
         return !TextUtils.isEmpty(cookie);
     }
 
@@ -65,8 +63,6 @@ public final class AccountController {
 
     public static final class LoginActivity extends AppCompatActivity {
 
-        private static final String LOGIN_URL = "http://te31.com/m/main_login.php";
-
         @Override
         protected void onCreate(@Nullable Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -82,13 +78,15 @@ public final class AccountController {
             }
 
             WebView webView = (WebView) findViewById(R.id.web_view);
-            webView.loadUrl(LOGIN_URL);
+            webView.loadUrl(Constants.Url.LOGIN);
+            webView.getSettings().setJavaScriptEnabled(true);
+            webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
             webView.setWebViewClient(new WebViewClient() {
 
                 @Override
                 public void onPageFinished(WebView view, String url) {
                     Log.d(String.valueOf(url));
-                    if (url != null && !url.startsWith(LOGIN_URL)) {
+                    if (url != null && url.startsWith(Constants.Url.MAIN_NEW)) {
                         finish();
                         if (!sListeners.isEmpty()) {
                             Handler handler = new Handler();

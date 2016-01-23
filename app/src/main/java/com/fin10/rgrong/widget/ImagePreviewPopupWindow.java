@@ -1,4 +1,4 @@
-package com.fin10.rgrong;
+package com.fin10.rgrong.widget;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -12,6 +12,8 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.fin10.rgrong.PostModel;
+import com.fin10.rgrong.R;
 
 import java.util.Collection;
 

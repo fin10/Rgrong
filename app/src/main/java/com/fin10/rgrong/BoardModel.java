@@ -37,7 +37,6 @@ public final class BoardModel implements Parcelable {
     };
 
     private static final String PREF_KEY_LAST_BOARD_ITEM = "pref_key_last_board_item";
-    private static final String URL = "http://te31.com/m/main.php";
     private final String mName;
     private final String mId;
     private final int mNewPostCount;
@@ -83,7 +82,7 @@ public final class BoardModel implements Parcelable {
     @NonNull
     public static List<BoardModel> getBoards() {
         try {
-            Connection connection = Jsoup.connect(URL);
+            Connection connection = Jsoup.connect(Constants.Url.MAIN);
             Document doc = connection.get();
 
             List<BoardModel> items = new ArrayList<>();

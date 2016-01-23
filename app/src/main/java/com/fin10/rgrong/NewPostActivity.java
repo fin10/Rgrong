@@ -10,8 +10,6 @@ import android.webkit.WebViewClient;
 
 public final class NewPostActivity extends AppCompatActivity {
 
-    private static final String WRITE_URL = "http://te31.com/m/write.php?id=";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,13 +31,13 @@ public final class NewPostActivity extends AppCompatActivity {
         }
 
         WebView webView = (WebView) findViewById(R.id.web_view);
-        webView.loadUrl(WRITE_URL + board.getId());
+        webView.loadUrl(Constants.Url.WRITE + "?id=" + board.getId());
         webView.setWebViewClient(new WebViewClient() {
 
             @Override
             public void onPageFinished(WebView view, String url) {
                 Log.d(String.valueOf(url));
-                if (url != null && !url.startsWith(WRITE_URL)) {
+                if (url != null && !url.startsWith(Constants.Url.WRITE)) {
                     finish();
                 }
             }

@@ -18,6 +18,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.fin10.rgrong.widget.EndlessScrollListener;
+import com.fin10.rgrong.widget.ImagePreviewPopupWindow;
 
 import java.util.ArrayList;
 import java.util.List;

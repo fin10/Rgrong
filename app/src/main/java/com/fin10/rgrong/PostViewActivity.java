@@ -24,7 +24,6 @@ public final class PostViewActivity extends AppCompatActivity implements SwipeRe
         setSupportActionBar(toolbar);
 
         mPost = getIntent().getParcelableExtra("post");
-        Log.d(String.valueOf(mPost));
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -36,10 +35,7 @@ public final class PostViewActivity extends AppCompatActivity implements SwipeRe
         mRefreshLayout.setOnRefreshListener(this);
 
         mWebView = (WebView) findViewById(R.id.web_view);
-        mWebView.getSettings().setSupportZoom(true);
-        mWebView.getSettings().setBuiltInZoomControls(false);
-        mWebView.getSettings().setLoadWithOverviewMode(true);
-        mWebView.getSettings().setUseWideViewPort(true);
+        mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.loadUrl(mPost.getUrl());
     }
 

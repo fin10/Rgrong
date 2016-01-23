@@ -32,7 +32,6 @@ public final class PostModel implements Parcelable {
     };
 
     private static final String URL = "http://te31.com/m/mlist.php?id=";
-    private static final String DETAIL_URL = "http://te31.com/m/view.php?id=";
     private final String mBoardId;
     private final String mId;
     private final String mTitle;
@@ -233,6 +232,6 @@ public final class PostModel implements Parcelable {
 
     @NonNull
     public String getUrl() {
-        return DETAIL_URL + mBoardId + "&no=" + mId;
+        return Constants.Url.VIEW + "?id=" + mBoardId + "&no=" + mId;
     }
 }
