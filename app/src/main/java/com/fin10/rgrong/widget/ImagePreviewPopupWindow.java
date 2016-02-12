@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
@@ -35,7 +36,7 @@ public final class ImagePreviewPopupWindow {
         mTitleView = (TextView) view.findViewById(R.id.file_name_view);
 
         int size = context.getResources().getDimensionPixelSize(R.dimen.preview_size);
-        mPopupWindow = new PopupWindow(view, size, size);
+        mPopupWindow = new PopupWindow(view, WindowManager.LayoutParams.MATCH_PARENT, size);
     }
 
     public void show(@NonNull View anchor, @NonNull PostModel post) {

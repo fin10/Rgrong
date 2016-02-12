@@ -1,5 +1,6 @@
 package com.fin10.rgrong;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -24,6 +25,12 @@ public final class MainActivity extends AppCompatActivity implements View.OnClic
     private DrawerLayout mDrawer;
     private View mNewPostButton;
 
+    @NonNull
+    private static PostModel.Filter getLastFilter(@NonNull Context context) {
+        String value = PreferenceManager.getDefaultSharedPreferences(context).getString(PREF_FILTER, String.valueOf(PostModel.Filter.NONE));
+        return PostModel.Filter.valueOf(value);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,11 +51,8 @@ public final class MainActivity extends AppCompatActivity implements View.OnClic
         mDrawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        String value = PreferenceManager.getDefaultSharedPreferences(this).getString(PREF_FILTER, String.valueOf(PostModel.Filter.NONE));
-        PostModel.Filter filter = PostModel.Filter.valueOf(value);
-
         mBoardFragment = (BoardFragment) getFragmentManager().findFragmentById(R.id.board_fragment);
-        mBoardFragment.setBoard(mBoard, filter);
+        mBoardFragment.setBoard(mBoard, getLastFilter(this));
 
         BoardListFragment boardListFragment = (BoardListFragment) getFragmentManager().findFragmentById(R.id.board_list_fragment);
         boardListFragment.setOnItemClickListener(this);
@@ -71,9 +75,7 @@ public final class MainActivity extends AppCompatActivity implements View.OnClic
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main_activity, menu);
 
-        String value = PreferenceManager.getDefaultSharedPreferences(this).getString(PREF_FILTER, String.valueOf(PostModel.Filter.NONE));
-        PostModel.Filter filter = PostModel.Filter.valueOf(value);
-
+        PostModel.Filter filter = getLastFilter(this);
         MenuItem item = menu.findItem(R.id.menu_filter_only_images);
         switch (filter) {
             case NONE:
@@ -135,7 +137,7 @@ public final class MainActivity extends AppCompatActivity implements View.OnClic
             actionBar.setTitle(mBoard.getName());
         }
 
-        mBoardFragment.setBoard(mBoard, PostModel.Filter.NONE);
+        mBoardFragment.setBoard(mBoard, getLastFilter(this));
     }
 
     @Override
