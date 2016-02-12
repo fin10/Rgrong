@@ -4,7 +4,7 @@ gradle
 .DS_Store
 /build
 /captures
-*.iml
+/.idea
 *.apk
 /gradlew
 /gradlew.bat
