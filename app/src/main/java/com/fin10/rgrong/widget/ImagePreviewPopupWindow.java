@@ -7,12 +7,12 @@ import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
-import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.fin10.rgrong.PostModel;
 import com.fin10.rgrong.R;
 
@@ -20,7 +20,6 @@ import java.util.Collection;
 
 public final class ImagePreviewPopupWindow {
 
-    private final WebView mWebView;
     private final ImageView mImageView;
     private final PopupWindow mPopupWindow;
     private final TextView mTitleView;
@@ -28,9 +27,6 @@ public final class ImagePreviewPopupWindow {
     public ImagePreviewPopupWindow(@NonNull Context context) {
         @SuppressLint("InflateParams")
         View view = LayoutInflater.from(context).inflate(R.layout.image_preview, null);
-        mWebView = (WebView) view.findViewById(R.id.web_view);
-        mWebView.getSettings().setUseWideViewPort(true);
-        mWebView.getSettings().setLoadWithOverviewMode(true);
 
         mImageView = (ImageView) view.findViewById(R.id.image_view);
         mTitleView = (TextView) view.findViewById(R.id.file_name_view);
@@ -41,7 +37,6 @@ public final class ImagePreviewPopupWindow {
 
     public void show(@NonNull View anchor, @NonNull PostModel post) {
         mPopupWindow.showAsDropDown(anchor);
-        mWebView.setVisibility(View.GONE);
         mImageView.setVisibility(View.GONE);
 
         new AsyncTask<PostModel, Void, Collection<String>>() {
@@ -57,19 +52,12 @@ public final class ImagePreviewPopupWindow {
                     String link = imageLinks.iterator().next();
                     mTitleView.setText(link);
 
-                    if (link.endsWith(".gif") || link.endsWith(".GIF")) {
-                        mImageView.setVisibility(View.GONE);
-                        mWebView.setVisibility(View.VISIBLE);
-                        mWebView.loadUrl(link);
-                    } else {
-                        mImageView.setVisibility(View.VISIBLE);
-                        mWebView.setVisibility(View.GONE);
-                        Glide.with(mImageView.getContext())
-                                .load(link)
-                                .crossFade()
-                                .centerCrop()
-                                .into(mImageView);
-                    }
+                    mImageView.setVisibility(View.VISIBLE);
+                    Glide.with(mImageView.getContext())
+                            .load(link)
+                            .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                            .centerCrop()
+                            .into(mImageView);
                 }
             }
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, post);

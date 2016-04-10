@@ -115,7 +115,7 @@ public final class PostModel implements Parcelable {
                     int c = imgs.size();
                     for (int j = 0; j < c; ++j) {
                         Element img = imgs.get(j);
-                        if ("image_up.gif".equalsIgnoreCase(img.attr("src"))) {
+                        if (img.attr("src").endsWith("image_up.gif")) {
                             hasImages = true;
                             break;
                         }
@@ -214,7 +214,7 @@ public final class PostModel implements Parcelable {
                 for (int j = 0; j < imgCount; ++j) {
                     Element img = imgs.get(j);
                     String src = img.attr("src");
-                    if (!TextUtils.isEmpty(src) && src.startsWith("http://te31.com/rgr/data")) {
+                    if (!TextUtils.isEmpty(src) && src.startsWith("http://bg.gg/i")) {
                         Log.d("src:%s", src);
                         mThumbnailLinks.add(src);
                     }
