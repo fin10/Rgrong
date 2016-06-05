@@ -99,7 +99,7 @@ public final class PostModel implements Parcelable {
                 }
 
                 Elements tds = table.getElementsByTag("td");
-                if (tds == null || tds.size() < 2) {
+                if (tds == null || tds.size() != 4) {
                     continue;
                 }
 
@@ -214,7 +214,7 @@ public final class PostModel implements Parcelable {
                 for (int j = 0; j < imgCount; ++j) {
                     Element img = imgs.get(j);
                     String src = img.attr("src");
-                    if (!TextUtils.isEmpty(src) && src.startsWith("http://bg.gg/i")) {
+                    if (!TextUtils.isEmpty(src) && src.contains("http://bg.gg/i/")) {
                         Log.d("src:%s", src);
                         mThumbnailLinks.add(src);
                     }
